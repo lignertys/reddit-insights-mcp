@@ -1,0 +1,51 @@
+{
+  "name": "reddit-insights-mcp",
+  "version": "0.1.0",
+  "description": "Reddit Insights MCP Server - AI-powered Reddit search and discovery",
+  "main": "dist/index.js",
+  "bin": {
+    "reddit-insights-mcp": "./dist/index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "reddit",
+    "ai",
+    "search",
+    "claude"
+  ],
+  "author": "",
+  "license": "MIT",
+  "homepage": "https://github.com/lignertys/reddit-insights-mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lignertys/reddit-insights-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lignertys/reddit-insights-mcp/issues"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "dotenv": "^16.5.0",
+    "zod": "^3.25.36"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}
