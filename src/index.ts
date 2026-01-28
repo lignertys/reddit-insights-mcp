@@ -97,29 +97,45 @@ const tools = [
 ];
 
 // API request helper
-async function apiRequest(endpoint: string, params: Record<string, any> = {}) {
+async function apiRequest(
+  endpoint: string, 
+  options: { 
+    method?: "GET" | "POST"; 
+    params?: Record<string, any>; 
+    body?: Record<string, any>;
+  } = {}
+) {
+  const { method = "GET", params = {}, body } = options;
   const url = new URL(`${API_BASE_URL}${endpoint}`);
 
-  // Add query parameters
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null) {
-      url.searchParams.append(key, String(value));
-    }
-  });
+  // Add query parameters for GET requests
+  if (method === "GET") {
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        url.searchParams.append(key, String(value));
+      }
+    });
+  }
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    "User-Agent": "reddit-insights-mcp/0.1.0",
+    "User-Agent": "reddit-insights-mcp/0.1.1",
   };
 
   if (API_KEY) {
     headers["Authorization"] = `Bearer ${API_KEY}`;
   }
 
-  const response = await fetch(url.toString(), {
-    method: "GET",
+  const fetchOptions: RequestInit = {
+    method,
     headers,
-  });
+  };
+
+  if (method === "POST" && body) {
+    fetchOptions.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url.toString(), fetchOptions);
 
   if (!response.ok) {
     throw new Error(`API request failed: ${response.status} ${response.statusText}`);
@@ -133,9 +149,12 @@ async function handleRedditSearch(args: { query: string; limit?: number }) {
   const { query, limit = 20 } = args;
 
   try {
-    const result = await apiRequest("/api/search", {
-      q: query,
-      limit,
+    const result = await apiRequest("/api/v1/search/semantic", {
+      method: "POST",
+      body: {
+        query,
+        limit,
+      },
     });
 
     return {
@@ -163,10 +182,13 @@ async function handleListSubreddits(args: { page?: number; limit?: number; searc
   const { page = 1, limit = 20, search } = args;
 
   try {
-    const result = await apiRequest("/api/subreddits", {
-      page,
-      limit,
-      search,
+    const result = await apiRequest("/api/v1/subreddits", {
+      method: "GET",
+      params: {
+        page,
+        limit,
+        search,
+      },
     });
 
     return {
@@ -194,7 +216,9 @@ async function handleGetSubreddit(args: { subreddit: string }) {
   const { subreddit } = args;
 
   try {
-    const result = await apiRequest(`/api/subreddits/${subreddit}`);
+    const result = await apiRequest(`/api/v1/subreddits/${subreddit}`, {
+      method: "GET",
+    });
 
     return {
       content: [
@@ -221,11 +245,14 @@ async function handleGetTrends(args: { page?: number; perPage?: number; filter?:
   const { page = 1, perPage = 12, filter, category } = args;
 
   try {
-    const result = await apiRequest("/api/trends", {
-      page,
-      perPage,
-      filter,
-      category,
+    const result = await apiRequest("/api/v1/trends", {
+      method: "POST",
+      body: {
+        page,
+        per_page: perPage,
+        filter,
+        category,
+      },
     });
 
     return {
@@ -254,7 +281,7 @@ async function main() {
   const server = new Server(
     {
       name: "reddit-insights-mcp",
-      version: "0.1.0",
+      version: "0.1.2",
     },
     {
       capabilities: {

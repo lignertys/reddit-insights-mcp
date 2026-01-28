@@ -1,6 +1,6 @@
 {
   "name": "reddit-insights-mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Reddit Insights MCP Server - AI-powered Reddit search and discovery",
   "mcpName": "io.github.lignertys/reddit-insights-mcp",
   "main": "dist/index.js",
